@@ -20,9 +20,24 @@ function Table() {
       console.log("tableData", tableData);
     }, [tableData]);
 
+    const mapOrderStatus = (status) => {
+      switch (status) {
+        case "paid":
+          return "Оплачен";
+        case "dispensed":
+          return "Выдан";
+        case "accepted":
+          return "Принят";
+        case "ready":
+          return "Готов";
+        default:
+          return "";
+      }
+    };
+
   return (
     <div className="table-container">
-        <table>
+        <table id="orders">
           <thead>
             <tr>
                 <th>Дата</th>
@@ -44,8 +59,8 @@ function Table() {
                   <td>{row.order_date}</td>
                   <td>{row.order_id}</td>
                   <td>{row.order_content.join(", ")}</td>
-                  <td>{row.order_status}</td>
-                  <td>{row.payment_status}</td>
+                  <td>{mapOrderStatus(row.order_status)}</td>
+                  <td>{mapOrderStatus(row.payment_status)}</td>
                   <td>{row.total_price}</td>
                   <td>{`${row.client.first_name} ${row.client.second_name}`}</td>
                   <td>{row.client.chat_id}</td>
