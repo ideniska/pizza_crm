@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import './table.css';
 
 function Table() {
+  const [searchText, setSearchText] = useState('');
+
     const [tableData, setTableData] = useState([])
     const fetchTableData = () => {
       fetch(process.env.REACT_APP_GET_ORDERS_URL).then(response => {
@@ -30,6 +32,8 @@ function Table() {
           return "Принят";
         case "ready":
           return "Готов";
+        case "init":
+          return "Создан"
         default:
           return "";
       }
@@ -54,13 +58,32 @@ function Table() {
             </tr>
           </thead>
           <tbody>
+            <tr>
+                <th></th>
+                <th><input type="text" onChange={(e) => setSearchText(e.target.value)} /></th>
+                <th></th>
+                <th><input type="text" onChange={(e) => setSearchText(e.target.value)} /></th>
+                <th><input type="text" onChange={(e) => setSearchText(e.target.value)} /></th>
+                <th></th>
+                <th><input type="text" onChange={(e) => setSearchText(e.target.value)} /></th>
+                <th><input type="text" onChange={(e) => setSearchText(e.target.value)} /></th>
+                <th><input type="text" onChange={(e) => setSearchText(e.target.value)} /></th>
+                <th><input type="text" onChange={(e) => setSearchText(e.target.value)} /></th>
+                <th></th>
+            </tr>
           {tableData.length > 0 && tableData.map(row => (
                 <tr key={row.order_id}>
                   <td>{row.order_date}</td>
                   <td>{row.order_id}</td>
                   <td>{row.order_content.join(", ")}</td>
                   <td>{mapOrderStatus(row.order_status)}</td>
-                  <td>{mapOrderStatus(row.payment_status)}</td>
+                  <td>
+                    <select aria-label="Default select example">
+                      <option selected>{mapOrderStatus(row.payment_status)}</option>
+                      <option value="refund">Возвращен</option>
+                      <option value="paid">Оплачен</option>
+                    </select>
+                  </td>
                   <td>{row.total_price}</td>
                   <td>{`${row.client.first_name} ${row.client.second_name}`}</td>
                   <td>{row.client.chat_id}</td>
