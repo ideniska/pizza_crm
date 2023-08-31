@@ -1,12 +1,12 @@
-import './App.css';
-import Table from './components/table/table';
-import Search from './components/search/search';
+import "./App.css";
+import Table from "./components/table/table";
 
 function App() {
-  return (<div className="App"> 
-  <Search/> 
-  <Table/> 
-  </div>);
+  return (
+    <div className="App">
+      <Table />
+    </div>
+  );
 }
 
 export default App;
