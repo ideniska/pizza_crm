@@ -214,7 +214,13 @@ function Table() {
 
   const handleCookingIdInputChange = (e) => {
     const val = e.target.value;
-    searchCookingId(val);
+    if (val === "") {
+      debouncedSearchCookingId.cancel();
+      setSearchCookingOrderId("None");
+      setShouldFetch(true);
+    } else {
+      debouncedSearchCookingId(val);
+    }
   };
 
   const handleStatusInputChange = (e) => {
@@ -224,25 +230,49 @@ function Table() {
 
   const handleSecondNameInputChange = (e) => {
     const val = e.target.value;
-    debouncedSearchSecondName(val);
+    if (val === "") {
+      debouncedSearchSecondName.cancel();
+      setSearchSecondName("None");
+      setShouldFetch(true);
+    } else {
+      debouncedSearchSecondName(val);
+    }
   };
-
+  
   const handleChatIDInputChange = (e) => {
     const val = e.target.value;
-    debouncedSearchChatID(val);
+    if (val === "") {
+      debouncedSearchChatID.cancel();
+      setSearchChatId("None");
+      setShouldFetch(true);
+    } else {
+      debouncedSearchChatID(val);
+    }
   };
-
+  
   const handleEmailInputChange = (e) => {
     const val = e.target.value;
-    debouncedSearchEmail(val);
+    if (val === "") {
+      debouncedSearchEmail.cancel();
+      setSearchEmail("None");
+      setShouldFetch(true);
+    } else {
+      debouncedSearchEmail(val);
+    }
   };
-
+  
   const handlePhoneInputChange = (e) => {
     const val = e.target.value;
-    debouncedSearchPhone(val);
+    if (val === "") {
+      debouncedSearchPhone.cancel();
+      setSearchPhone("None");
+      setShouldFetch(true);
+    } else {
+      debouncedSearchPhone(val);
+    }
   };
 
-  const searchCookingId = _.debounce((q) => {
+  const debouncedSearchCookingId = _.debounce((q) => {
     setSearchCookingOrderId(q);
     setShouldFetch(true);
   }, 1500);
