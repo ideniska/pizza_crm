@@ -1,3 +1,9 @@
+Эндпоинты указываются в файле .env в корне папки frontend
+Необходимо указывать полный url для эндпоинта
+Пример: REACT_APP_GET_ORDERS_URL=http://127.0.0.1:8001/get_orders/
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

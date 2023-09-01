@@ -9,9 +9,6 @@ from rest_framework.response import Response
 from datetime import datetime, timedelta
 from django.db.models import Q
 from django.http import (
-    HttpResponseBadRequest,
-    HttpResponse,
-    HttpResponseNotAllowed,
     JsonResponse,
 )
 
@@ -22,99 +19,19 @@ def add_fake_data(request):
     return Response("Added")
 
 
-# @api_view(["GET"])
-# def get_orders(request):
-#     orders_query = Orders.objects.all()
-#     items_per_page = 50
-#     paginator = Paginator(orders_query, items_per_page)
-#     page_number = request.GET.get("page", 1)
-#     orders = paginator.get_page(page_number)
-#     serialized_orders = []
-
-#     for o in orders:
-#         serialized_orders.append(
-#             {
-#                 "order_id": o.cooking_number,
-#                 "order_date": o.created_at,
-#                 "order_content": o.order_content,
-#                 "order_status": o.order_status,
-#                 "payment_status": o.payment_status,
-#                 "total_price": o.total_price,
-#                 "client": {
-#                     "first_name": o.first_name,
-#                     "second_name": o.second_name,
-#                     "chat_id": o.chat_id,
-#                     "email": o.email,
-#                     "phone": o.phone,
-#                 },
-#                 "order_comment": o.comment,
-#             }
-#         )
-
-#     return Response(
-#         {
-#             "count": paginator.count,  # Total number of orders
-#             "num_pages": paginator.num_pages,  # Total number of pages
-#             "page_number": orders.number,  # Current page number
-#             "orders": serialized_orders,  # Orders data for the current page
-#         }
-#     )
-
-
-@api_view(["GET"])
-def get_past_orders(request):
-    current_date = datetime.now().date()
-    print("start")
-    delta = request.GET["days"]
-    print(f"{delta=}")
-    target_date = current_date - timedelta(days=int(delta))  # TODO переделать в с - по
-    orders_query = Orders.objects.filter(created_at__gte=target_date)
-    items_per_page = 50
-    paginator = Paginator(orders_query, items_per_page)
-    page_number = request.GET.get("page", 1)
-    orders = paginator.get_page(page_number)
-    serialized_orders = []
-
-    for o in orders:
-        serialized_orders.append(
-            {
-                "order_id": o.cooking_number,
-                "order_date": o.created_at,
-                "order_content": o.order_content,
-                "order_status": o.order_status,
-                "payment_status": o.payment_status,
-                "total_price": o.total_price,
-                "client": {
-                    "first_name": o.first_name,
-                    "second_name": o.second_name,
-                    "chat_id": o.chat_id,
-                    "email": o.email,
-                    "phone": o.phone,
-                },
-                "order_comment": o.comment,
-            }
-        )
-
-    return Response(
-        {
-            "count": paginator.count,  # Total number of orders
-            "num_pages": paginator.num_pages,  # Total number of pages
-            "page_number": orders.number,  # Current page number
-            "orders": serialized_orders,  # Orders data for the current page
-        }
-    )
-
-
 @api_view(["GET"])
 def get_orders(request):
     page = int(request.GET.get("page"))
     per_page = 2
     offset = (page - 1) * per_page
-
+    cooking_id = request.GET["cooking_id"]
+    cooking_status = request.GET["cooking_status"]
+    second_name = request.GET["second_name"]
+    chat_id = request.GET["chat_id"]
+    email = request.GET["email"]
+    phone = request.GET["phone"]
     start_date_str = request.GET["start_date"]
     end_date_str = request.GET["end_date"]
-    print(f"{start_date_str=} {end_date_str=}")
-
     orders = MOCK_ORDERS
     total_items = len(orders)
     total_pages = (total_items + per_page - 1) // per_page
@@ -125,17 +42,52 @@ def get_orders(request):
             order_date = datetime.strptime(order_date_str, "%Y-%m-%d").date()
             start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
             end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
-
             if start_date <= order_date <= end_date:
                 orders_response.append(o)
 
+    print(f"Before filter {orders_response=}")
+    print(f"{cooking_id=}")
+    for o in orders_response:
+        if cooking_id != "None":
+            orders_response = [
+                o for o in orders_response if o["cooking_id"] == cooking_id
+            ]
+
+    for o in orders_response:
+        if cooking_status != "None":
+            orders_response = [
+                o for o in orders_response if o["cooking_status"] == cooking_status
+            ]
+
+    for o in orders_response:
+        if chat_id != "None":
+            orders_response = [
+                o for o in orders_response if o["client"]["chat_id"] == chat_id
+            ]
+
+    for o in orders_response:
+        if email != "None":
+            orders_response = [
+                o for o in orders_response if o["client"]["email"] == email
+            ]
+
+    for o in orders_response:
+        if phone != "None":
+            orders_response = [
+                o for o in orders_response if o["client"]["phone"] == phone
+            ]
+
+    for o in orders_response:
+        if second_name != "None":
+            orders_response = [
+                o for o in orders_response if o["client"]["second_name"] == second_name
+            ]
+
+    print(f"{orders_response=}")
     paginated_data = orders_response[offset : offset + per_page]
     print(f"{paginated_data=} {total_pages=}")
-    # response = Response(paginated_data)
-    # response["Access-Control-Allow-Origin"] = "*"  # Allow requests from any origin
-    # return response
     response = {
-        "count": total_pages,  # Add the count of pages to the response
+        "count": total_pages,
         "orders": paginated_data,
     }
     return JsonResponse(response, safe=False)
@@ -147,7 +99,7 @@ MOCK_ORDERS = [
         "cooking_id": "111",
         "order_date": "2023-07-11",
         "order_content": ["Пепперони", "Маргирита"],
-        "order_status": "ready",
+        "cooking_status": "ready",
         "payment_status": "paid",
         "total_price": 290,
         "client": {
@@ -164,7 +116,7 @@ MOCK_ORDERS = [
         "cooking_id": "112",
         "order_date": "2023-08-22",
         "order_content": ["Деревенская", "Маргирита"],
-        "order_status": "dispensed",
+        "cooking_status": "dispensed",
         "payment_status": "paid",
         "total_price": 310,
         "client": {
@@ -181,7 +133,7 @@ MOCK_ORDERS = [
         "cooking_id": "113",
         "order_date": "2023-08-23",
         "order_content": ["Сырная"],
-        "order_status": "init",
+        "cooking_status": "init",
         "payment_status": "paid",
         "total_price": 100,
         "client": {
@@ -198,7 +150,7 @@ MOCK_ORDERS = [
         "cooking_id": "114",
         "order_date": "2023-08-24",
         "order_content": ["Сырная"],
-        "order_status": "init",
+        "cooking_status": "dispensed",
         "payment_status": "paid",
         "total_price": 100,
         "client": {
@@ -215,7 +167,7 @@ MOCK_ORDERS = [
         "cooking_id": "115",
         "order_date": "2023-08-27",
         "order_content": ["Грибная"],
-        "order_status": "init",
+        "cooking_status": "cooking",
         "payment_status": "pad",
         "total_price": 110,
         "client": {
@@ -232,7 +184,7 @@ MOCK_ORDERS = [
         "cooking_id": "116",
         "order_date": "2023-08-28",
         "order_content": ["Грибная"],
-        "order_status": "init",
+        "cooking_status": "accepted",
         "payment_status": "paid",
         "total_price": 110,
         "client": {
@@ -249,7 +201,7 @@ MOCK_ORDERS = [
         "cooking_id": "117",
         "order_date": "2023-08-29",
         "order_content": ["Грибная"],
-        "order_status": "init",
+        "cooking_status": "init",
         "payment_status": "init",
         "total_price": 10,
         "client": {
@@ -266,7 +218,7 @@ MOCK_ORDERS = [
         "cooking_id": "118",
         "order_date": "2023-08-30",
         "order_content": ["Грибная"],
-        "order_status": "init",
+        "cooking_status": "init",
         "payment_status": "paid",
         "total_price": 110,
         "client": {
@@ -283,7 +235,7 @@ MOCK_ORDERS = [
         "cooking_id": "119",
         "order_date": "2023-08-31",
         "order_content": ["Грибная"],
-        "order_status": "init",
+        "cooking_status": "init",
         "payment_status": "paid",
         "total_price": 110,
         "client": {
@@ -313,27 +265,34 @@ def start_refund(request):
     return JsonResponse({"orders": id_list})
 
 
-@api_view(["GET"])
-def filter(request):
-    filter_field = request.GET["filter_field"]
-    filter_query = request.GET["filter_query"]
-    print(f"{filter_field=} {filter_query=}")
-    orders = MOCK_ORDERS
-    orders_response = []
-    for o in orders:
-        try:
-            if o[filter_field] == filter_query and o["payment_status"] == "paid":
-                orders_response.append(o)
-        except KeyError:
-            if (
-                o["client"][filter_field] == filter_query
-                and o["payment_status"] == "paid"
-            ):
-                orders_response.append(o)
+# @api_view(["GET"])
+# def filter(request):
+#     page = int(request.GET.get("page"))
+#     per_page = 2
+#     offset = (page - 1) * per_page
+#     orders = MOCK_ORDERS
+#     total_items = len(orders)
+#     total_pages = (total_items + per_page - 1) // per_page
+#     filter_field = request.GET["filter_field"]
+#     filter_query = request.GET["filter_query"]
+#     print(f"{filter_field=} {filter_query=}")
+#     orders = MOCK_ORDERS
+#     orders_response = []
+#     for o in orders:
+#         try:
+#             if o[filter_field] == filter_query and o["payment_status"] == "paid":
+#                 orders_response.append(o)
+#         except KeyError:
+#             if (
+#                 o["client"][filter_field] == filter_query
+#                 and o["payment_status"] == "paid"
+#             ):
+#                 orders_response.append(o)
 
-    print(f"{orders_response=}")
-    response = {
-        "count": 4,  # Add the count of pages to the response
-        "orders": orders_response,
-    }
-    return JsonResponse(response, safe=False)
+#     print(f"{orders_response=}")
+#     paginated_data = orders_response[offset : offset + per_page]
+#     response = {
+#         "count": 4,  # Add the count of pages to the response
+#         "orders": paginated_data,
+#     }
+#     return JsonResponse(response, safe=False)
