@@ -443,7 +443,7 @@ function Table() {
           >
             Назад
           </button>
-          <button onClick={handleNextPage} disabled={pageCount <= 1 || page == pageCount - 2}>
+          <button onClick={handleNextPage} disabled={pageCount <= 1 || page == pageCount}>
             Вперед
           </button>
         </div>

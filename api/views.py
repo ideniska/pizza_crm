@@ -33,8 +33,7 @@ def get_orders(request):
     start_date_str = request.GET["start_date"]
     end_date_str = request.GET["end_date"]
     orders = MOCK_ORDERS
-    total_items = len(orders)
-    total_pages = (total_items + per_page - 1) // per_page
+
     orders_response = []
     for o in orders:
         if o["payment_status"] == "paid":
@@ -84,6 +83,8 @@ def get_orders(request):
             ]
 
     print(f"{orders_response=}")
+    total_items = len(orders_response)
+    total_pages = (total_items + per_page - 1) // per_page
     paginated_data = orders_response[offset : offset + per_page]
     print(f"{paginated_data=} {total_pages=}")
     response = {
@@ -246,6 +247,91 @@ MOCK_ORDERS = [
             "phone": 8963107000,
         },
         "order_comment": "Не обслуживать!",
+    },
+    {
+        "order_id": "1263",
+        "cooking_id": "120",
+        "order_date": "2023-09-01",
+        "order_content": ["Грибная"],
+        "cooking_status": "init",
+        "payment_status": "paid",
+        "total_price": 110,
+        "client": {
+            "first_name": "Магнус",
+            "second_name": "Пук",
+            "chat_id": "182135678",
+            "email": "xxxxxx@bbbb.com",
+            "phone": 8963107000,
+        },
+        "order_comment": "Не обслуживать!",
+    },
+    {
+        "order_id": "1264",
+        "cooking_id": "105",
+        "order_date": "2023-09-02",
+        "order_content": ["Грибная"],
+        "cooking_status": "dispensed",
+        "payment_status": "paid",
+        "total_price": 110,
+        "client": {
+            "first_name": "Вова",
+            "second_name": "Петеров",
+            "chat_id": "182135678",
+            "email": "xxxxxx@bbbb.com",
+            "phone": 8963107000,
+        },
+        "order_comment": "Нааааа!",
+    },
+    {
+        "order_id": "1265",
+        "cooking_id": "105",
+        "order_date": "2023-09-02",
+        "order_content": ["Грибная"],
+        "cooking_status": "dispensed",
+        "payment_status": "paid",
+        "total_price": 110,
+        "client": {
+            "first_name": "Выф",
+            "second_name": "Выф",
+            "chat_id": "182135678",
+            "email": "xxxxxx@bbbb.com",
+            "phone": 8963107000,
+        },
+        "order_comment": "Нааааа!",
+    },
+    {
+        "order_id": "1266",
+        "cooking_id": "105",
+        "order_date": "2023-09-02",
+        "order_content": ["Грибная"],
+        "cooking_status": "dispensed",
+        "payment_status": "paid",
+        "total_price": 110,
+        "client": {
+            "first_name": "Саллли",
+            "second_name": "Гоп",
+            "chat_id": "182135678",
+            "email": "xxxxxx@bbbb.com",
+            "phone": 8963107000,
+        },
+        "order_comment": "Нааааа!",
+    },
+    {
+        "order_id": "1267",
+        "cooking_id": "105",
+        "order_date": "2023-09-02",
+        "order_content": ["Грибная"],
+        "cooking_status": "init",
+        "payment_status": "paid",
+        "total_price": 110,
+        "client": {
+            "first_name": "Игор",
+            "second_name": "Марков",
+            "chat_id": "182135678",
+            "email": "xxxxxx@bbbb.com",
+            "phone": 8963107000,
+        },
+        "order_comment": "Нааааа!",
     },
 ]
 
